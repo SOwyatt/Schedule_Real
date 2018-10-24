@@ -1,4 +1,5 @@
 var nodemailer = require("nodemailer");
+var SQL = require("./sql.js:");
 
 var transporter = nodemailer.createTransport({
     service : 'gmail',
@@ -13,7 +14,7 @@ transporter.sendMail({
     to : 'travisbergeron2011@gmail.com',
     subject : 'Testing nodemailer',
     text : 'It works!'
-},function(err, info) {
+}, function(err, info) {
     if(err) throw err;
     console.log("Email sent " + info.response);
 });

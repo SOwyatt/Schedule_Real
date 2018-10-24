@@ -1,12 +1,5 @@
 var mySQL = require("mysql");
 
-var con = mySQL.createConnection({ //Create connection
-    host : "localhost",
-    database : "testdb1",
-    user : "root",
-    password : "F9vZ6!7)nF2)Gru" 
-});
-
 function parse(obj, callback) {
     /** Parses an sql query. 
      * @arg callback : A callback function, will be passed the data
@@ -19,8 +12,14 @@ function parse(obj, callback) {
      obj.replace_ = obj.replace_ || [];
      callback = callback || function() {};
 
+    var con = mySQL.createConnection({ //Create connection
+        host : "localhost",
+        database : "testdb1",
+        user : "root",
+        password : "F9vZ6!7)nF2)Gru" 
+    });
+
     con.connect(function(err) {
-        console.log("connection created");
         if(err) throw err;
 
         //Connect and pass the sql command to the server
@@ -32,9 +31,11 @@ function parse(obj, callback) {
             else if(obj.result) { // Pass the data to the callback if result is true
                 callback(null, data)
             }
+            else callback();
+
+            con.end(); // End the connection after all is done
         });
     });
-    console.log("Made it out.");
 }
 
 module.exports = {
