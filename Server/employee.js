@@ -1,10 +1,11 @@
 /**
  * @fileoverview Defines the Employee class and related classes to it
  * 
- * @TODO: BOTH compile functions, they don't work
+ * TODO:  Make compile employees functions for position and department, as well as a compile positions for department
+ * TODO:  Employee.fetchAll still doesn't work
  * 
  * @author Travis Bergeron
- * @version 1.3.0
+ * @version 1.3.2
  * 
  * @requires ./sql.js
  */
@@ -68,8 +69,9 @@ class Employee {
                             }
                         }
                     }
+                    result.push(new Employee(data[i].id, data[i].name, resultPos, data[i].email, data[i].stat)); 
                     // Append this employee to the result list
-                    result.push(new Employee(data[i].id, data[i].name, resultPos, data[i].email, data[i].stat));
+                    resultPos = []; // Reset resultPos for the new employee
                 }
                 callback(null, result);
             });
@@ -88,30 +90,6 @@ class Position {
         this.id = id;
         this.department = department;
         this.title = title;
-    }
-
-    /**
-     * @callback compileEmployeesCallback 
-     */
-    compileEmployees(callback) {
-        var id = this.id; // this will be out of scope
-        Employee.fetchAll(function(err, data) {
-            if(err) {
-                console.error(err);
-                callback(err, null);
-                throw err;
-            }
-
-            var result = [];
-            for(var i = 0; i < data.length; i++) { // Loop through all employees
-                for(var j = 0; j < data[i].positions.length; j++) { // Loop through all this employee's positions
-                    if(data[i].positions[j].id === id) { // if this position's id is the id of this, they match. Add the employee to the list
-                        result.push(data[i]);
-                        break; // exit the second loop, preventing duplicates
-                    }
-                }
-            }
-        });
     }
 
     /**
@@ -169,31 +147,6 @@ class Department {
     }
 
     /**
-     * @callback compileEmployeesCallback
-     */
-    compileEmployees(callback) {
-        var id = this.id; // this will be out of scope
-        Employee.fetchAll(function(err, data) {
-            if(err) { // Basic error handling
-                console.error(err);
-                callback(err);
-                throw err;
-            }
-
-            var result = [];
-            for(var i = 0; i < data.length; i++) { // Loop through all employees
-                for(var j = 0; j < data[i].positions.length; j++) { // Loop through all the positions this employee holds
-                    if(data[i].positions[j].department.id === id) { // If the id of this position = this.id, the employee belongs to this position
-                        result.push(data[i]);
-                        break; // Exit the second loop, preventing duplicates
-                    }
-                }
-            }
-            callback(null, result);
-        });
-    }
-
-    /**
      * Fetches all the departments from the SQL
      * @callback fetchAllDeptCallback
      */
@@ -219,13 +172,11 @@ class Department {
     }
 }
 
+//testing
 function main() {
-    var pos = Position.fetchAll(function(err, data) {
-        if(err) throw err;
-        for(var i = 0; i < data.length; i++) {
-            console.log(data[i].compileEmployees());
-        }
-    });
+    Employee.fetchAll(function(err, data) {
+        console.log(data[0].positions);
+    })
 }
 
 main()
