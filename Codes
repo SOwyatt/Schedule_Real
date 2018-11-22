@@ -1,0 +1,36 @@
+/* DEPT CODES */
+
+100 - Kitchen
+200 - Floor / Dining
+300 - Bar
+
+Positions
+
+110 - Head Chef
+101 - Dishwasher
+102 - Prep-Cook
+103 - Line-Cook
+104 - Pizza Cook
+105 - Driver
+
+210 - Manager
+201 - Busser
+202 - Host/Hostess
+203 - Server
+
+310 - Bar Manager
+301 - Bartender
+
+
+/* HOLIDAY EXCEPTION CODES */
+
+/* Employees */
+
+0 - Exempt (From All Hands or Extra Hands needed)
+1 - Required (On non-all hands day)
+
+/* Holidays */
+
+999 - All Hands
+10 - Closed
+xxx.yy - yy extra hands needed on position xxx (Can be negative, in that case yy fewer hands)

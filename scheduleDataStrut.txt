@@ -1,0 +1,75 @@
+/* SCHEDULE */
+
+"Schedule" {
+    int id // (Based on start date)
+    [Days]
+}
+
+Day {
+    Date date
+    [Positions]
+}
+
+Position {
+    String title
+    [Shifts]
+}
+
+Shift {
+    int id
+    int startTime
+    int endTime
+    int assigned // (Can be either false (0), or an employee id)
+}
+
+/* SCHEDULE GUIDE */
+
+TrueGuide {
+    [employees]
+    [guideShifts]
+}
+
+employee {
+    int id
+    String name
+    String email
+    [positions]
+    stats {
+        int rating
+        int conflictPriority
+    }
+}
+
+position {
+    int id
+    Department department
+    String title
+}
+
+department {
+    int id
+    String title
+    function compileEmployees returns [employees]
+}
+
+MetaGuide {
+    [holidays]
+}
+
+Holiday {
+    Date date
+    String title
+    bool allHandsOnDeck
+    changes {
+        [[position, change], [position, change]] // Where position is a position and change i -1, 2 etc.
+        exceptions:  [[id, code], [id, code]] // where id is a employee id and code is an exception code
+    }
+}
+
+/** EXCEPTION CODES
+ * DEPT # - Works in that department
+ * 0 - Unemployed at time 
+ * 1 - Exemption
+ * 2 - Double when single
+ * 3 - Single when double
+*/
