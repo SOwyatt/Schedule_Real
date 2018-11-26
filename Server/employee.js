@@ -36,8 +36,6 @@ class Employee {
      * @callback fetchAllEmpCallback
      */
     static fetchAll(callback) {
-        var result = [];
-
         Position.fetchAll(function(err, data) {
             if(err) { // Basic error handling
                 console.error(err);
@@ -45,30 +43,30 @@ class Employee {
                 throw err;
             }
 
-            var positions = data; // The list of all existing positions
+            let positions = data; // The list of all existing positions
 
             SQL.parse({
                 sql : "SELECT * FROM employees",
                 result : true
             }, function(err, data) {
+                let result = []; // This is the scope result will be used in
                 if(err) { // Basic error handling
                     console.error(err);
                     callback(err, null);
                     throw err;
                 }
 
-                var resultPos = [];
-                for(var i = 0; i < data.length; i++) { // Loop through all employees
-                    var curEmpPos = data[i].positions.split(/,/g); // Split positions at the comma, as they're stored
-                    for(var j = 0; j < curEmpPos.length; j++) { // Loop through all the positions this employee holds
-                        for(var k = 0; k < positions.length; k++) { // Loop through all positions that exist
+                for(let i = 0, leni = data.length; i < leni; ++i) { // Loop through all employees
+                    let curEmpPos = data[i].positions.split(/,/g); // Split positions at the comma, as they're stored
+                    let resultPos = []; // Block scoped so will automatically be reset
+                    for(let j = 0, lenj = curEmpPos.length; j < lenj; ++j) { // Loop through all the positions this employee holds
+                        for(let k = 0, lenk = positions.length; k < lenk; ++k) { // Loop through all positions that exist
                             if(positions[k].id == curEmpPos[j]) { // If curEmpPos is the same as the position we're on
                                 resultPos.push(positions[k]); // Add this position to the employee's positions
                             }
                         }
                     }
                     result.push(new Employee(data[i].id, data[i].name, resultPos, data[i].email, data[i].stat));
-                    resultPos = []; // Reset resultPos for the next employee
                 }
                 callback(null, result);
             });
@@ -118,8 +116,6 @@ class Position {
      * @callback fetchAllPositionsCallback
      */
     static fetchAll(callback) {
-        var result = [];
-
         Department.fetchAll(function(err, data) {
             if(err) { // Basic error handling
                 console.error(err);
@@ -127,22 +123,23 @@ class Position {
                 throw err;
             }
 
-            var departments = data; // Will be out of scope
+            let departments = data; // Will be out of scope
 
             SQL.parse({
                 sql : "SELECT * FROM positions",
                 result : true
             }, function(err, data) {
+                let result = []; // This is the scope result will be used in
                 if(err) { // Basic error handling
                     console.error(err);
                     callback(err, null);
                     throw err;
                 }
-                for(var i = 0; i < data.length; i++) {
+                for(let i = 0, leni = data.length; i < leni; ++i) {
                     // Truncates the last two digits, turing 310 into 300 etc..
-                    var dept = Math.floor(data[i].id / 100) * 100;
+                    let dept = Math.floor(data[i].id / 100) * 100;
 
-                    for(var j = 0; j < departments.length; j++) { // Loop through all departments until a match is found
+                    for(let j = 0, lenj = departments.length; j < lenj; ++j) { // Loop through all departments until a match is found
                         if(dept === departments[j].id) {
                             dept = departments[j]; 
                             break; // Exit loop after department is found, preventing duplicates
@@ -197,19 +194,18 @@ class Department {
      * @callback fetchAllDeptCallback
      */
     static fetchAll(callback) {
-        var result = [];
-
         SQL.parse({
             sql : "SELECT * FROM departments;",
             result : true
         }, function(err, data) {
+            let result = [];
             if(err) { // Basic error handling
                 console.error(err);
                 callback(err, null);
                 throw err;
             }
 
-            for(var i = 0; i < data.length; i++) {
+            for(let i = 0, len = data.length; i < len; ++i) {
                 // Loop through all entries and make new departments
                 result.push(new Department(data[i].id, data[i].title));
             }
@@ -219,6 +215,9 @@ class Department {
 }
 
 function main() {
+    Employee.fetchAll(function(err, data) {
+        console.log(data[2].positions);
+    });
 }
 
 main()
