@@ -1,7 +1,7 @@
 /**
  * Handles SQL queries & closeley related
  * 
- * @requires npm:mysql
+ * @requires npm:mySQL
  */
 
 var mySQL = require("mysql");
@@ -16,7 +16,7 @@ var pool = mySQL.createPool({ //Create connection
 
 /**
  * Parses an sql query
- * @param {{sql : string replace_ : [string, [string], [string]] result : boolean}} obj 
+ * @param {{sql : string replace_ : [string] result : boolean}} obj 
  * @callback parseCallback
  */
 function parse(obj, callback) {
