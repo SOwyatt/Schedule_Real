@@ -2,7 +2,7 @@
  * @fileoverview Defines the Employee class and related classes to it
  * 
  * TODO:  Make compile employees functions for position and department, as well as a compile positions for department
- * TODO:  Employee.fetchAll still doesn't work
+ * TODO:  Employee.fetchAll still doesn't work for positions if holding > 1
  * 
  * @author Travis Bergeron
  * @version 1.3.2
@@ -26,6 +26,7 @@ class Employee {
         this.id = id;
         this.name = name;
         this.positions = positions;
+        this.email = email;
         this.stat = stat || {
             rating: -1, 
             conflictPriority: 0.5
@@ -59,17 +60,12 @@ class Employee {
                 }
 
                 var resultPos = [];
+                console.log(data.length);
                 for(var i = 0; i < data.length; i++) { // Loop through all the employees returned 
+                    console
                     var positionsEmp = data[i].positions.split(","); // Position ids are saved split by a ','
-                    for(var j = 0; j < positionsEmp.length; j++) { // Loop through all the positions that exist
-                        for(var k = 0; k < positions.length; k++) { // Loop through all the position ids of this employee
-                            if(positionsEmp[j] == parseInt(positions[k].id)) { // If the id of this position matches the position we're checking
-                                resultPos.push(positions[k]);
-                                break; // Stop searching if this position matches others
-                            }
-                        }
-                    }
-                    result.push(new Employee(data[i].id, data[i].name, resultPos, data[i].email, data[i].stat)); 
+                    console.log(data[i].name + positionsEmp);
+                    // result.push(new Employee(data[i].id, data[i].name, resultPos, data[i].email, data[i].stat)); 
                     // Append this employee to the result list
                     resultPos = []; // Reset resultPos for the new employee
                 }
