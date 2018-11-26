@@ -1,8 +1,7 @@
 /**
  * @fileoverview Defines the Employee class and related classes to it
  * 
- * TODO:  Make compile employees functions for position and department, as well as a compile positions for department
- * TODO:  Employee.fetchAll still doesn't work
+ * @TODO: BOTH compile functions, they don't work
  * 
  * @author Travis Bergeron
  * @version 1.3.0
@@ -69,7 +68,6 @@ class Employee {
                             }
                         }
                     }
-                    result.push(new Employee(data[i].id, data[i].name, resultPos, data[i].email, data[i].stat)); 
                     // Append this employee to the result list
                     result.push(new Employee(data[i].id, data[i].name, resultPos, data[i].email, data[i].stat));
                 }
