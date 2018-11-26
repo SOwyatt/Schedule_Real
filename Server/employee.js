@@ -72,7 +72,7 @@ class Employee {
                 callback(null, result);
             });
         });
-    }
+    } 
 }
 
 class Position {
