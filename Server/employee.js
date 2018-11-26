@@ -1,7 +1,7 @@
 /**
- * @fileoverview Defines the Employee class and related classes to it
+ * @fileoverview Defines the Employee class and related subclasses
  * 
- * TODO:  Make compile employees functions for position and department, as well as a compile positions for department
+ * TODO: Add save and retrive functions
  * 
  * @author Travis Bergeron
  * @version 1.3.0
@@ -63,6 +63,7 @@ class Employee {
                         for(let k = 0, lenk = positions.length; k < lenk; ++k) { // Loop through all positions that exist
                             if(positions[k].id == curEmpPos[j]) { // If curEmpPos is the same as the position we're on
                                 resultPos.push(positions[k]); // Add this position to the employee's positions
+                                break; // It can't be more than one position, this saves time
                             }
                         }
                     }
@@ -87,29 +88,30 @@ class Position {
         this.title = title;
     }
 
-    // /**
-    //  * @callback compileEmployeesCallback 
-    //  */
-    // compileEmployees(callback) {
-    //     var id = this.id; // this will be out of scope
-    //     Employee.fetchAll(function(err, data) {
-    //         if(err) {
-    //             console.error(err);
-    //             callback(err, null);
-    //             throw err;
-    //         }
-
-    //         var result = [];
-    //         for(var i = 0; i < data.length; i++) { // Loop through all employees
-    //             for(var j = 0; j < data[i].positions.length; j++) { // Loop through all this employee's positions
-    //                 if(data[i].positions[j].id === id) { // if this position's id is the id of this, they match. Add the employee to the list
-    //                     result.push(data[i]);
-    //                     break; // exit the second loop, preventing duplicates
-    //                 }
-    //             }
-    //         }
-    //     });
-    // }
+    /**
+     * Compiles a list of all the employees who hold this position
+     * @callback compileEmployeesPosCallback 
+     */
+    compileEmployees(callback) {
+        let id = this.id; // Will be out of scope
+        Employee.fetchAll(function(err, data) {
+            if(err) { // Basic error handling
+                console.error(err);
+                callback(err, null);
+                throw err;
+            }
+            let result = [];
+            for(let i = 0, leni = data.length; i < leni; ++i) { // Loop through all the employees 
+                for(let j = 0, lenj = data[i].positions.length; j < lenj; ++j) { // Loop through all the positions this employee holds
+                    if(data[i].positions[j].id === id) { // if this position matches the one we belong to
+                        result.push(data[i]);
+                        break; // Break because the position can't be this one twice
+                    }
+                }
+            }
+            callback(null, result);
+        });
+    }
 
     /**
      * Fetches all positions from the SQL database
@@ -147,7 +149,7 @@ class Position {
                     }
                     result.push(new Position(data[i].id, dept, data[i].title));
                 }
-                callback(null, result)
+                callback(null, result);
             });
         });
     }
@@ -165,29 +167,51 @@ class Department {
     }
 
     /**
-     * @callback compileEmployeesCallback
+     * Compiles a list of all the employees who work in this department
+     * @callback compileEmployeesDeptCallback
      */
-    // compileEmployees(callback) {
-    //     var id = this.id; // this will be out of scope
-    //     Employee.fetchAll(function(err, data) {
-    //         if(err) { // Basic error handling
-    //             console.error(err);
-    //             callback(err);
-    //             throw err;
-    //         }
+    compileEmployees(callback) {
+        let id = this.id; // This will be out of scope later
+        Employee.fetchAll(function(err, data) {
+            if(err) { // Basic error handling
+                console.error(err);
+                callback(err, null);
+                throw err;
+            }
+            let result = [];
+            for(let i = 0, leni = data.length; i < leni; ++i) { // Loop through all the employees
+                for(let j = 0, lenj = data[i].positions.length; j < lenj; ++j) { // Loop through all positions this employee holds
+                    if(data[i].positions[j].department.id === id) { // If this positions department is the same as this department
+                        result.push(data[i]);
+                        break; // Exit the loop if it matched, preventing duplicates if an employee holds multiple positions in the dept
+                    }
+                }
+            }
+            callback(null, result);
+        });
+    }
 
-    //         var result = [];
-    //         for(var i = 0; i < data.length; i++) { // Loop through all employees
-    //             for(var j = 0; j < data[i].positions.length; j++) { // Loop through all the positions this employee holds
-    //                 if(data[i].positions[j].department.id === id) { // If the id of this position = this.id, the employee belongs to this position
-    //                     result.push(data[i]);
-    //                     break; // Exit the second loop, preventing duplicates
-    //                 }
-    //             }
-    //         }
-    //         callback(null, result);
-    //     });
-    // }
+    /**
+     * Compiles a list of all positions in this department
+     * @callback compilePositionsDeptCallback
+     */
+    compilePositions(callback) {
+        let id = this.id; // This will be out of scope later
+        Position.fetchAll(function(err, data) {
+            if(err) { // Basic error handling
+                console.error(err);
+                callback(err, null);
+                throw err;
+            }
+            let result = [];
+            for(let i = 0, leni = data.length; i < leni; ++i) { // Loop through all positions that exist
+                if(data[i].department.id === id) { // If this position's department matches, add it
+                    result.push(data[i]);
+                }
+            }
+            callback(null, result);
+        });
+    }
 
     /**
      * Fetches all the departments from the SQL
@@ -215,9 +239,16 @@ class Department {
 }
 
 function main() {
-    Employee.fetchAll(function(err, data) {
-        console.log(data[2].positions);
-    });
+    dept = new Department(100, "Kitchen");
+    dept.compilePositions(function(err, data) {
+        console.log(data);
+    })
 }
 
-main()
+main();
+
+// module.exports = {
+//     Employee : Employee,
+//     Department : Department,
+//     Position : Position
+// };

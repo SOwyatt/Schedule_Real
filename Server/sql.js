@@ -1,7 +1,7 @@
 /**
  * Handles SQL queries & closeley related
  * 
- * @requires npm:mySQL
+ * @requires npm:mysql
  */
 
 var mySQL = require("mysql");
