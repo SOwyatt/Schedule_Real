@@ -1,7 +1,7 @@
 /**
  * @fileoverview Defines the Employee class and related classes to it
  * 
- * @TODO: BOTH compile functions, they don't work
+ * TODO:  Make compile employees functions for position and department, as well as a compile positions for department
  * 
  * @author Travis Bergeron
  * @version 1.3.0
@@ -58,18 +58,17 @@ class Employee {
                 }
 
                 var resultPos = [];
-                for(var i = 0; i < data.length; i++) { // Loop through all the employees returned 
-                    var positionsEmp = data[i].positions.split(","); // Position ids are saved split by a ','
-                    for(var j = 0; j < positionsEmp.length; j++) { // Loop through all the positions that exist
-                        for(var k = 0; k < positions.length; k++) { // Loop through all the position ids of this employee
-                            if(positionsEmp[j] == parseInt(positions[k].id)) { // If the id of this position matches the position we're checking
-                                resultPos.push(positions[k]);
-                                break; // Stop searching if this position matches others
+                for(var i = 0; i < data.length; i++) { // Loop through all employees
+                    var curEmpPos = data[i].positions.split(/,/g); // Split positions at the comma, as they're stored
+                    for(var j = 0; j < curEmpPos.length; j++) { // Loop through all the positions this employee holds
+                        for(var k = 0; k < positions.length; k++) { // Loop through all positions that exist
+                            if(positions[k].id == curEmpPos[j]) { // If curEmpPos is the same as the position we're on
+                                resultPos.push(positions[k]); // Add this position to the employee's positions
                             }
                         }
                     }
-                    // Append this employee to the result list
                     result.push(new Employee(data[i].id, data[i].name, resultPos, data[i].email, data[i].stat));
+                    resultPos = []; // Reset resultPos for the next employee
                 }
                 callback(null, result);
             });
@@ -90,29 +89,29 @@ class Position {
         this.title = title;
     }
 
-    /**
-     * @callback compileEmployeesCallback 
-     */
-    compileEmployees(callback) {
-        var id = this.id; // this will be out of scope
-        Employee.fetchAll(function(err, data) {
-            if(err) {
-                console.error(err);
-                callback(err, null);
-                throw err;
-            }
+    // /**
+    //  * @callback compileEmployeesCallback 
+    //  */
+    // compileEmployees(callback) {
+    //     var id = this.id; // this will be out of scope
+    //     Employee.fetchAll(function(err, data) {
+    //         if(err) {
+    //             console.error(err);
+    //             callback(err, null);
+    //             throw err;
+    //         }
 
-            var result = [];
-            for(var i = 0; i < data.length; i++) { // Loop through all employees
-                for(var j = 0; j < data[i].positions.length; j++) { // Loop through all this employee's positions
-                    if(data[i].positions[j].id === id) { // if this position's id is the id of this, they match. Add the employee to the list
-                        result.push(data[i]);
-                        break; // exit the second loop, preventing duplicates
-                    }
-                }
-            }
-        });
-    }
+    //         var result = [];
+    //         for(var i = 0; i < data.length; i++) { // Loop through all employees
+    //             for(var j = 0; j < data[i].positions.length; j++) { // Loop through all this employee's positions
+    //                 if(data[i].positions[j].id === id) { // if this position's id is the id of this, they match. Add the employee to the list
+    //                     result.push(data[i]);
+    //                     break; // exit the second loop, preventing duplicates
+    //                 }
+    //             }
+    //         }
+    //     });
+    // }
 
     /**
      * Fetches all positions from the SQL database
@@ -171,27 +170,27 @@ class Department {
     /**
      * @callback compileEmployeesCallback
      */
-    compileEmployees(callback) {
-        var id = this.id; // this will be out of scope
-        Employee.fetchAll(function(err, data) {
-            if(err) { // Basic error handling
-                console.error(err);
-                callback(err);
-                throw err;
-            }
+    // compileEmployees(callback) {
+    //     var id = this.id; // this will be out of scope
+    //     Employee.fetchAll(function(err, data) {
+    //         if(err) { // Basic error handling
+    //             console.error(err);
+    //             callback(err);
+    //             throw err;
+    //         }
 
-            var result = [];
-            for(var i = 0; i < data.length; i++) { // Loop through all employees
-                for(var j = 0; j < data[i].positions.length; j++) { // Loop through all the positions this employee holds
-                    if(data[i].positions[j].department.id === id) { // If the id of this position = this.id, the employee belongs to this position
-                        result.push(data[i]);
-                        break; // Exit the second loop, preventing duplicates
-                    }
-                }
-            }
-            callback(null, result);
-        });
-    }
+    //         var result = [];
+    //         for(var i = 0; i < data.length; i++) { // Loop through all employees
+    //             for(var j = 0; j < data[i].positions.length; j++) { // Loop through all the positions this employee holds
+    //                 if(data[i].positions[j].department.id === id) { // If the id of this position = this.id, the employee belongs to this position
+    //                     result.push(data[i]);
+    //                     break; // Exit the second loop, preventing duplicates
+    //                 }
+    //             }
+    //         }
+    //         callback(null, result);
+    //     });
+    // }
 
     /**
      * Fetches all the departments from the SQL
@@ -220,12 +219,6 @@ class Department {
 }
 
 function main() {
-    var pos = Position.fetchAll(function(err, data) {
-        if(err) throw err;
-        for(var i = 0; i < data.length; i++) {
-            console.log(data[i].compileEmployees());
-        }
-    });
 }
 
 main()
